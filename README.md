@@ -1,1 +1,1 @@
-# log-linter
+# loglint
