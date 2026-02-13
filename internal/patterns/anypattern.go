@@ -38,31 +38,18 @@ func NewAnyPattern() *AnyPattern {
 		(Symbol
 			name@(Or
 				"log.Fatal"
-				"log.Fatalln"
 				"log.Panic"
-				"log.Panicln"
 				"log.Print"
-				"log.Println"
 				"(*log.Logger).Fatal"
-				"(*log.Logger).Fatalln"
 				"(*log.Logger).Panic"
-				"(*log.Logger).Panicln"
 				"(*log.Logger).Print"
-				"(*log.Logger).Println"
 				"(*go.uber.org/zap.SugaredLogger).DPanic"
-				"(*go.uber.org/zap.SugaredLogger).DPanicln"
 				"(*go.uber.org/zap.SugaredLogger).Debug"
-				"(*go.uber.org/zap.SugaredLogger).Debugln"
 				"(*go.uber.org/zap.SugaredLogger).Error"
-				"(*go.uber.org/zap.SugaredLogger).Errorln"
 				"(*go.uber.org/zap.SugaredLogger).Fatal"
-				"(*go.uber.org/zap.SugaredLogger).Fatalln"
 				"(*go.uber.org/zap.SugaredLogger).Info"
-				"(*go.uber.org/zap.SugaredLogger).Infoln"
 				"(*go.uber.org/zap.SugaredLogger).Panic"
-				"(*go.uber.org/zap.SugaredLogger).Panicln"
-				"(*go.uber.org/zap.SugaredLogger).Warn"
-				"(*go.uber.org/zap.SugaredLogger).Warnln"))
+				"(*go.uber.org/zap.SugaredLogger).Warn"))
 		args)
 `)}
 }

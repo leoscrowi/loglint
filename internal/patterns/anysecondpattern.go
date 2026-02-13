@@ -37,8 +37,7 @@ func NewAnySecondPattern() *AnySecondPattern {
 	(CallExpr
 		(Symbol
 			name@(Or
-				"(*go.uber.org/zap.SugaredLogger).Log"
-				"(*go.uber.org/zap.SugaredLogger).Logln"))
+				"(*go.uber.org/zap.SugaredLogger).Log"))
 		args)
 `),
 	}

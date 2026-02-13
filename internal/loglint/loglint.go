@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/leoscrowi/loglint/internal/patterns"
+	//"github.com/leoscrowi/loglint/internal/rules"
 	"golang.org/x/tools/go/analysis"
 	"honnef.co/go/tools/pattern"
 )
@@ -17,12 +18,16 @@ var Analyzer = &analysis.Analyzer{
 
 func run(pass *analysis.Pass) (interface{}, error) {
 	var patt = []patterns.Pattern{
+		patterns.NewAnyLnPattern(),
+		patterns.NewAnySecondLnPattern(),
 		patterns.NewAnySecondPattern(),
 		patterns.NewAnyPattern(),
 		patterns.NewFirstPattern(),
 		patterns.NewSecondPattern(),
 		patterns.NewThirdPattern(),
 	}
+
+	//var rules []rules.Rule
 
 	for _, file := range pass.Files {
 		isImported := false
