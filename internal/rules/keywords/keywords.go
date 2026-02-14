@@ -36,9 +36,10 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, str string) {
 					}
 
 					if lit, litValue := rules.AsStringLiteral(arg); lit != nil {
-						if p, e, _, ok := keywordPos(lit, litValue, r.keywords); ok {
+						if p, e, matched, ok := keywordPos(lit, litValue, r.keywords); ok {
 							d.Pos = p
 							d.End = e
+							d.Message = "sensitive data not allowed: " + strconv.Quote(matched)
 						} else {
 							d.Pos = lit.Pos()
 							d.End = lit.End()
