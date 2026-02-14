@@ -23,6 +23,7 @@ var Analyzer = &analysis.Analyzer{
 }
 
 var rulesCSV string
+var keywordsCSV string
 
 func init() {
 	Analyzer.Flags = *flag.NewFlagSet("loglint", flag.ContinueOnError)
@@ -33,6 +34,54 @@ func init() {
 		"",
 		"list of rules (e.g. englishcheck,keywords)",
 	)
+
+	Analyzer.Flags.StringVar(
+		&keywordsCSV,
+		"keywords",
+		"",
+		"list of keywords (for rule keywords)",
+	)
+}
+
+func RulesFactories() []rules.Rule {
+	var kw = []string{}
+	for _, dkw := range DefaultKeyWords {
+		kw = append(kw, strings.ToLower(dkw))
+	}
+
+	extra := splitCSV(keywordsCSV)
+	if len(extra) > 0 {
+		for _, ekw := range extra {
+			kw = append(kw, strings.ToLower(ekw))
+		}
+	}
+
+	ruleFactories := map[string]func() rules.Rule{
+		"englishcheck":   func() rules.Rule { return englishcheck.NewRule() },
+		"specialsymbols": func() rules.Rule { return specialsymbols.NewRule() },
+		"lowercase":      func() rules.Rule { return lowercase.NewRule() },
+		"keywords":       func() rules.Rule { return keywords.NewRule(kw) },
+	}
+
+	enabled := splitCSV(rulesCSV)
+	if len(enabled) == 0 {
+		return []rules.Rule{
+			ruleFactories["englishcheck"](),
+			ruleFactories["specialsymbols"](),
+			ruleFactories["keywords"](),
+			ruleFactories["lowercase"](),
+		}
+	}
+
+	var checked []rules.Rule
+	for _, name := range enabled {
+		f, ok := ruleFactories[name]
+		if !ok {
+			continue
+		}
+		checked = append(checked, f())
+	}
+	return checked
 }
 
 func run(pass *analysis.Pass) (interface{}, error) {
@@ -46,30 +95,13 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		patterns.NewThirdPattern(),
 	}
 
-	var checkedRules []rules.Rule
-	enabledRules := splitCSV(rulesCSV)
-	if len(enabledRules) == 0 {
-		checkedRules = []rules.Rule{
-			englishcheck.NewRule(),
-			specialsymbols.NewRule(),
-			keywords.NewRule(),
-			lowercase.NewRule(),
-		}
-	} else {
-		for _, rule := range enabledRules {
-			r, ok := rulesMap[rule]
-			if !ok {
-				continue
-			}
-			checkedRules = append(checkedRules, r)
-		}
-	}
+	rules := RulesFactories()
 
 	for _, file := range pass.Files {
 		isImported := false
 		for _, imp := range file.Imports {
 			if imp.Path != nil {
-				if contains(logPackages, strings.Trim(imp.Path.Value, "\"")) {
+				if contains(LogPackages, strings.Trim(imp.Path.Value, "\"")) {
 					isImported = true
 					break
 				}
@@ -94,7 +126,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				ok := matcher.Match(p.GetPattern(), callExpr)
 				if ok {
 					str := p.HandleString(pass, callExpr)
-					for _, rule := range checkedRules {
+					for _, rule := range rules {
 						rule.Handle(pass, callExpr, str)
 					}
 				}

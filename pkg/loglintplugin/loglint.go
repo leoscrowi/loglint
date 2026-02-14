@@ -12,7 +12,8 @@ import (
 // https://golangci-lint.run/docs/plugins/module-plugins/
 
 type MySettings struct {
-	Rules []string `json:"rules"`
+	Rules    []string `json:"rules"`
+	Keywords []string `json:"keywords"`
 }
 
 type PluginLogLint struct {
@@ -39,6 +40,10 @@ func init() {
 func (f *PluginLogLint) BuildAnalyzers() ([]*analysis.Analyzer, error) {
 	if len(f.settings.Rules) > 0 {
 		_ = loglint.Analyzer.Flags.Set("rules", strings.Join(f.settings.Rules, ","))
+	}
+
+	if len(f.settings.Keywords) > 0 {
+		_ = loglint.Analyzer.Flags.Set("keywords", strings.Join(f.settings.Keywords, ","))
 	}
 
 	return []*analysis.Analyzer{

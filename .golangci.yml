@@ -17,6 +17,9 @@ linters:
             - specialsymbols
             - lowercase
             - keywords
+          keywords:
+            - "ASD"
+            - "onemorekeyword"
 
 issues:
   max-same-issues: 0

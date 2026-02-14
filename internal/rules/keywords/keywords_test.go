@@ -15,7 +15,7 @@ func TestOnString(t *testing.T) {
 	var sink testhelper.DiagSink
 	pass := sink.Pass(fset)
 
-	r := &Rule{}
+	r := &Rule{keywords: []string{"password"}}
 	r.Handle(pass, call, "")
 
 	d := testhelper.MustOneDiag(t, sink.Diags)
@@ -49,7 +49,7 @@ func TestOnString(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot unquote literal %q: %v", lit.Value, err)
 	}
-	wantFix := strconv.Quote(removeKeywords(unquoted))
+	wantFix := strconv.Quote(removeKeywords(unquoted, r.keywords))
 	if string(edit.NewText) != wantFix {
 		t.Fatalf("unexpected fix: got %s want %s", string(edit.NewText), wantFix)
 	}
@@ -62,7 +62,7 @@ func TestOnStringUppercase(t *testing.T) {
 	var sink testhelper.DiagSink
 	pass := sink.Pass(fset)
 
-	r := &Rule{}
+	r := &Rule{keywords: []string{"apikey"}}
 	r.Handle(pass, call, "")
 
 	d := testhelper.MustOneDiag(t, sink.Diags)
@@ -96,7 +96,7 @@ func TestOnStringUppercase(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot unquote literal %q: %v", lit.Value, err)
 	}
-	wantFix := strconv.Quote(removeKeywords(unquoted))
+	wantFix := strconv.Quote(removeKeywords(unquoted, r.keywords))
 	if string(edit.NewText) != wantFix {
 		t.Fatalf("unexpected fix: got %s want %s", string(edit.NewText), wantFix)
 	}
@@ -109,7 +109,7 @@ func TestOnStringManyReportings(t *testing.T) {
 	var sink testhelper.DiagSink
 	pass := sink.Pass(fset)
 
-	r := &Rule{}
+	r := &Rule{keywords: []string{"apikey"}}
 	r.Handle(pass, call, "")
 
 	if len(sink.Diags) != 2 {

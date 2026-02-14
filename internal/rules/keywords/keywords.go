@@ -10,24 +10,19 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
-var keywords = []string{
-	"apikey",
-	"password",
-	"token",
-	"api_key",
-	"api_token",
-	"apitoken",
+type Rule struct {
+	keywords []string
 }
 
-type Rule struct{}
-
-func NewRule() *Rule { return &Rule{} }
+func NewRule(kws []string) *Rule {
+	return &Rule{keywords: kws}
+}
 
 func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, str string) {
 	for _, arg := range call.Args {
 		for _, s := range extractNames(arg) {
 			lower := strings.ToLower(s)
-			for _, kw := range keywords {
+			for _, kw := range r.keywords {
 				if strings.Contains(lower, kw) {
 					msg := "sensitive data not allowed: " + strconv.Quote(s)
 
@@ -38,7 +33,7 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, str string) {
 					}
 
 					if lit, litValue := rules.AsStringLiteral(arg); lit != nil {
-						fix := removeKeywords(litValue)
+						fix := removeKeywords(litValue, r.keywords)
 						d.Pos = lit.Pos()
 						d.End = lit.End()
 						d.SuggestedFixes = []analysis.SuggestedFix{
@@ -108,7 +103,7 @@ func extractNames(e ast.Expr) []string {
 	}
 }
 
-func removeKeywords(s string) string {
+func removeKeywords(s string, keywords []string) string {
 	out := s
 	lower := strings.ToLower(out)
 
