@@ -5,7 +5,7 @@ Plugin was build as module plugin for `golangci-lint`
 - https://golangci-lint.run/docs/plugins/module-plugins/
 ______
 # Bonus Tasks:
-1. Configuration: Rules configuration in `.golangci.yml` \
+1. Configuration: Rules configuration in `.golangci.yml`
 ```bash
 settings:
   rules:
@@ -14,9 +14,10 @@ settings:
     - lowercase
     - keywords
 ```
-You can disable or enable some rules by editing `.golangci.yml` \
+You can disable or enable some rules by editing `.golangci.yml`
 2. Auto fixing: `SuggestedFixes` for automatic error fixing: use `path-to-loglint-project.../bin/loglint run --fix`
-3. Custom patterns: Added configuration field to \
+
+3. Custom patterns: Added configuration field to
 ```bash
 settings:
     keywords:
