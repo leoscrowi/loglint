@@ -33,7 +33,7 @@ jobs:
             golangci-lint custom -v
       - name: Run linter
         run: |
-          ./bin/loglint run -v ./
+          ./bin/loglint run -v ./...
       - name: Testing
         run: |
           go test ./...
