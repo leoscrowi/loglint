@@ -19,7 +19,5 @@ linters:
             - keywords
 
 issues:
-  max-per-linter: 0
-  max-per-file-from-linter: 0
   max-same-issues: 0
   uniq-by-line: false
