@@ -15,6 +15,7 @@ settings:
     - keywords
 ```
 You can disable or enable some rules by editing `.golangci.yml`
+
 2. Auto fixing: `SuggestedFixes` for automatic error fixing: use `path-to-loglint-project.../bin/loglint run --fix`
 
 3. Custom patterns: Added configuration field to
