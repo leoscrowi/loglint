@@ -44,7 +44,7 @@ func FindFirstStringLiteralInCall(call *ast.CallExpr) *ast.BasicLit {
 			}
 			return true
 		})
-
+		//
 		if lit != nil {
 			_, err := strconv.Unquote(lit.Value)
 			if err == nil {

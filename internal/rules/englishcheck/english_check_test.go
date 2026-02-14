@@ -45,7 +45,7 @@ func TestCheck(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		if got := check(tc.in); got != tc.want {
+		if got, _ := check(tc.in); got != tc.want {
 			t.Fatalf("check(%q) = %v, want %v", tc.in, got, tc.want)
 		}
 	}

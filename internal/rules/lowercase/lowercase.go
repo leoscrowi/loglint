@@ -39,6 +39,8 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, _ string) {
 			}
 
 			if c.Lit != nil {
+				d.Pos = c.Lit.Pos() + 1
+				d.End = c.Lit.End()
 				fix := toLowerFix(c.Value)
 				d.SuggestedFixes = []analysis.SuggestedFix{
 					{

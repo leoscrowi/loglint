@@ -39,7 +39,8 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, str string) {
 
 					if lit, litValue := rules.AsStringLiteral(arg); lit != nil {
 						fix := removeKeywords(litValue)
-
+						d.Pos = lit.Pos()
+						d.End = lit.End()
 						d.SuggestedFixes = []analysis.SuggestedFix{
 							{
 								Message: "Remove sensitive keywords from string literal",

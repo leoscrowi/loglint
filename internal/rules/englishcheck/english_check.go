@@ -2,6 +2,7 @@ package englishcheck
 
 import (
 	"go/ast"
+	"go/token"
 	"strconv"
 	"strings"
 	"unicode"
@@ -21,7 +22,9 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, _ string) {
 			if c.Value == "" {
 				continue
 			}
-			if !check(c.Value) {
+
+			isChecked, pos := check(c.Value)
+			if !isChecked {
 				continue
 			}
 
@@ -35,7 +38,8 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, _ string) {
 
 			if c.Lit != nil {
 				fix := removeLetters(c.Value)
-
+				d.Pos = c.Lit.Pos() + token.Pos(pos) + 1
+				d.End = c.Lit.End()
 				d.SuggestedFixes = []analysis.SuggestedFix{
 					{
 						Message: "Remove non-english letters from string literal",
@@ -70,13 +74,15 @@ func removeLetters(s string) string {
 	return b.String()
 }
 
-func check(str string) bool {
+func check(str string) (bool, int) {
+	pos := 0
 	for _, r := range str {
 		if unicode.IsLetter(r) && !isEnglish(r) {
-			return true
+			return true, pos
 		}
+		pos++
 	}
-	return false
+	return false, 0
 }
 
 func isEnglish(r rune) bool {

@@ -73,7 +73,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 					}
 				}
 			}
-			return false
+			return true
 		})
 	}
 	return nil, nil

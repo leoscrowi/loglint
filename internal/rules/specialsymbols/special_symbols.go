@@ -2,6 +2,7 @@ package specialsymbols
 
 import (
 	"go/ast"
+	"go/token"
 	"strconv"
 	"strings"
 	"unicode"
@@ -28,7 +29,7 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, _ string) {
 				continue
 			}
 
-			bad := findBadRunes(c.Value)
+			bad, posDx := findBadRunes(c.Value)
 			if len(bad) == 0 {
 				continue
 			}
@@ -42,6 +43,8 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, _ string) {
 			}
 
 			if c.Lit != nil {
+				d.Pos = c.Lit.Pos() + token.Pos(posDx) + 1
+				d.End = c.Lit.End()
 				fix := removeSpecials(c.Value)
 				d.SuggestedFixes = []analysis.SuggestedFix{
 					{
@@ -62,14 +65,22 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, _ string) {
 	}
 }
 
-func findBadRunes(s string) []rune {
+func findBadRunes(s string) ([]rune, int) {
 	var bad []rune
+	posDx := 0
+	pos := 0
+	f := false
 	for _, ru := range s {
 		if !unicode.IsOneOf(allowed, ru) {
 			bad = append(bad, ru)
+			if !f {
+				f = true
+				posDx = pos
+			}
 		}
+		pos++
 	}
-	return bad
+	return bad, posDx
 }
 
 func removeSpecials(s string) string {
