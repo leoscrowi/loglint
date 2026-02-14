@@ -4,6 +4,29 @@ This is a linter plugin that checks code style in log-messages
 Plugin was build as module plugin for `golangci-lint`
 - https://golangci-lint.run/docs/plugins/module-plugins/
 ______
+# Bonus Tasks:
+1. Configuration: Rules configuration in `.golangci.yml`
+```bash
+settings:
+  rules:
+    - englishcheck
+    - specialsymbols
+    - lowercase
+    - keywords
+```
+You can disable or enable some rules by editing `.golangci.yml`
+2. Auto fixing: `SuggestedFixes` for automatic error fixing: use `path-to-loglint-project.../bin/loglint run --fix`
+3. Custom patterns: Added configuration field to
+```bash
+settings:
+    keywords:
+    - "ASD"
+    - "onemorekeyword"
+```
+You add keywords with sensitive data by editing `.golangci.yml`
+
+4. CI/CD: Look at the `.github/` directory
+
 # Building
 ## Versions:
 - go: `go1.26.0`
@@ -14,12 +37,53 @@ cd loglint
 golangci-lint custom -v
 ```
 
-# Running
-(while you are in the project directory, if you're not - use `.../bin/loglint`, where ... - path to project instead of `./bin/loglint` )
+# Running in other project
+1) You need to build loglint, look at [this](#building)
+2) At first you need to be at your project directory that you want to lint
+2) Create `.golangci.yml`
 ```bash
-./bin/loglint run -v /path/to/go/project
+touch .golangci.yml
+```
+4) Fill the config file, you can use this:
+```bash
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - loglint
+
+  settings:
+    custom:
+      loglint:
+        type: module
+        description: linter for reporting log messages
+        original-url: github.com/leoscrowi/loglint
+        settings:
+          rules:
+            - englishcheck
+            - specialsymbols
+            - lowercase
+            - keywords
+          keywords:
+            - "ASD"
+            - "onemorekeyword"
+
+issues:
+  max-same-issues: 0
+  uniq-by-line: false
 ```
 
+5) Run the `path-to-loglint-project.../bin/loglint run -v ./...`
+
+# [Examples](docs)
+![](docs/loglint_before_fixes.jpg)
+___
+![](docs/loglint_after_fixes.jpg)
+___
+![](docs/project.jpg)
+___
+![Kubernetes project with disabled specialsymbols rule](docs/kubernetes_with_disabled_specialsymbols.png)
 # Functions that are checked by the linter
 ## Packages:
 - log
