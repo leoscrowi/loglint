@@ -44,7 +44,7 @@ func init() {
 }
 
 func RulesFactories() []rules.Rule {
-	var kw = []string{}
+	var kw []string
 	for _, dkw := range DefaultKeyWords {
 		kw = append(kw, strings.ToLower(dkw))
 	}
@@ -95,7 +95,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		patterns.NewThirdPattern(),
 	}
 
-	rules := RulesFactories()
+	enabledRules := RulesFactories()
 
 	for _, file := range pass.Files {
 		isImported := false
@@ -126,7 +126,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				ok := matcher.Match(p.GetPattern(), callExpr)
 				if ok {
 					str := p.HandleString(pass, callExpr)
-					for _, rule := range rules {
+					for _, rule := range enabledRules {
 						rule.Handle(pass, callExpr, str)
 					}
 				}
