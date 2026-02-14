@@ -5,7 +5,12 @@ import (
 	"strings"
 
 	"github.com/leoscrowi/loglint/internal/patterns"
-	//"github.com/leoscrowi/loglint/internal/rules"
+	"github.com/leoscrowi/loglint/internal/rules"
+	"github.com/leoscrowi/loglint/internal/rules/englishcheck"
+	"github.com/leoscrowi/loglint/internal/rules/keywords"
+	"github.com/leoscrowi/loglint/internal/rules/lowercase"
+	"github.com/leoscrowi/loglint/internal/rules/specialsymbols"
+
 	"golang.org/x/tools/go/analysis"
 	"honnef.co/go/tools/pattern"
 )
@@ -27,7 +32,12 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		patterns.NewThirdPattern(),
 	}
 
-	//var rules []rules.Rule
+	var checkedRules = []rules.Rule{
+		lowercase.NewRule(),
+		englishcheck.NewRule(),
+		keywords.NewRule(),
+		specialsymbols.NewRule(),
+	}
 
 	for _, file := range pass.Files {
 		isImported := false
@@ -40,12 +50,10 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 		}
 
-		// skip if it's no imports
 		if !isImported {
 			continue
 		}
 
-		// we check functions with imports
 		matcher := &pattern.Matcher{
 			TypesInfo: pass.TypesInfo,
 		}
@@ -60,7 +68,9 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				ok := matcher.Match(p.GetPattern(), callExpr)
 				if ok {
 					str := p.HandleString(pass, callExpr)
-					pass.Reportf(callExpr.Pos(), "%s", str)
+					for _, rule := range checkedRules {
+						rule.Handle(pass, callExpr, str)
+					}
 				}
 			}
 			return false

@@ -1,0 +1,10 @@
+version: v2.9.0
+
+name: loglint
+
+destination: ./bin/
+
+plugins:
+  - module: 'github.com/leoscrowi/loglint'
+    path: .
+    import: 'github.com/leoscrowi/loglint/pkg/loglintplugin'

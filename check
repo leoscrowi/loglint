@@ -1,5 +1,0 @@
-#!/bin/bash
-go build -o loglint internal/cmd/loglint/main.go
-chmod u+x loglint
-go vet -vettool=./loglint ./...
-#./loglint
