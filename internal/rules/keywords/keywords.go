@@ -23,6 +23,9 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, str string) {
 		for _, s := range extractNames(arg) {
 			lower := strings.ToLower(s)
 			for _, kw := range r.keywords {
+				if kw == "" {
+					continue
+				}
 				if strings.Contains(lower, kw) {
 					msg := "sensitive data not allowed: " + strconv.Quote(s)
 
@@ -33,9 +36,15 @@ func (r *Rule) Handle(pass *analysis.Pass, call *ast.CallExpr, str string) {
 					}
 
 					if lit, litValue := rules.AsStringLiteral(arg); lit != nil {
+						if p, e, _, ok := keywordPos(lit, litValue, r.keywords); ok {
+							d.Pos = p
+							d.End = e
+						} else {
+							d.Pos = lit.Pos()
+							d.End = lit.End()
+						}
+
 						fix := removeKeywords(litValue, r.keywords)
-						d.Pos = lit.Pos()
-						d.End = lit.End()
 						d.SuggestedFixes = []analysis.SuggestedFix{
 							{
 								Message: "Remove sensitive keywords from string literal",
@@ -101,6 +110,31 @@ func extractNames(e ast.Expr) []string {
 	default:
 		return nil
 	}
+}
+
+func keywordPos(lit *ast.BasicLit, unquoted string, keywords []string) (pos, end token.Pos, matched string, ok bool) {
+	raw := lit.Value
+	lowerRaw := strings.ToLower(raw)
+	lowerUnq := strings.ToLower(unquoted)
+
+	for _, kw := range keywords {
+		kw = strings.ToLower(kw)
+		if kw == "" {
+			continue
+		}
+
+		if i := strings.Index(lowerRaw, kw); i >= 0 {
+			p := lit.Pos() + token.Pos(i)
+			return p, p + token.Pos(len(kw)), kw, true
+		}
+
+		if i := strings.Index(lowerUnq, kw); i >= 0 {
+			p := lit.Pos() + token.Pos(1+i)
+			return p, p + token.Pos(len(kw)), kw, true
+		}
+	}
+
+	return token.NoPos, token.NoPos, "", false
 }
 
 func removeKeywords(s string, keywords []string) string {
