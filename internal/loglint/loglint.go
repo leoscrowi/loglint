@@ -1,6 +1,7 @@
 package loglint
 
 import (
+	"flag"
 	"go/ast"
 	"strings"
 
@@ -21,6 +22,19 @@ var Analyzer = &analysis.Analyzer{
 	Run:  run,
 }
 
+var rulesCSV string
+
+func init() {
+	Analyzer.Flags = *flag.NewFlagSet("loglint", flag.ContinueOnError)
+
+	Analyzer.Flags.StringVar(
+		&rulesCSV,
+		"rules",
+		"",
+		"list of rules (e.g. englishcheck,keywords)",
+	)
+}
+
 func run(pass *analysis.Pass) (interface{}, error) {
 	var patt = []patterns.Pattern{
 		patterns.NewAnyLnPattern(),
@@ -32,11 +46,23 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		patterns.NewThirdPattern(),
 	}
 
-	var checkedRules = []rules.Rule{
-		lowercase.NewRule(),
-		englishcheck.NewRule(),
-		keywords.NewRule(),
-		specialsymbols.NewRule(),
+	var checkedRules []rules.Rule
+	enabledRules := splitCSV(rulesCSV)
+	if len(enabledRules) == 0 {
+		checkedRules = []rules.Rule{
+			englishcheck.NewRule(),
+			specialsymbols.NewRule(),
+			keywords.NewRule(),
+			lowercase.NewRule(),
+		}
+	} else {
+		for _, rule := range enabledRules {
+			r, ok := rulesMap[rule]
+			if !ok {
+				continue
+			}
+			checkedRules = append(checkedRules, r)
+		}
 	}
 
 	for _, file := range pass.Files {
@@ -86,4 +112,19 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
+}
+
+func splitCSV(s string) []string {
+	if strings.TrimSpace(s) == "" {
+		return nil
+	}
+	parts := strings.Split(s, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
 }

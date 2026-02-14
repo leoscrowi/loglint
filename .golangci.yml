@@ -12,7 +12,11 @@ linters:
         description: linter for reporting log messages
         original-url: github.com/leoscrowi/loglint
         settings:
-          one: Foo
+          rules:
+            - englishcheck
+            - specialsymbols
+            - lowercase
+            - keywords
 
 issues:
   max-per-linter: 0
