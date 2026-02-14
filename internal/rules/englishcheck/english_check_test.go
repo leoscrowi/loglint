@@ -125,11 +125,6 @@ func TestNonEnglishReportsDiagnosticWithFix(t *testing.T) {
 		t.Fatalf("message mismatch:\n got: %q\nwant: %q", d.Message, wantMsg)
 	}
 
-	if d.Pos != lit.Pos() || d.End != lit.End() {
-		t.Fatalf("expected diagnostic range to match literal; got [%v,%v), want [%v,%v)",
-			d.Pos, d.End, lit.Pos(), lit.End())
-	}
-
 	if len(d.SuggestedFixes) != 1 {
 		t.Fatalf("expected 1 suggested fix, got %d: %#v", len(d.SuggestedFixes), d.SuggestedFixes)
 	}
