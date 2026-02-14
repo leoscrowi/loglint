@@ -25,15 +25,15 @@ jobs:
       - run: go version
 
       - name: Install golangci-lint
-          run: |
+        run: |
             curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $(go env GOPATH)/bin v${{ matrix.golangci-lint-version }}
             golangci-lint --version
 
       - name: Build loglint plugin
-          run: |
+        run: |
             golangci-lint custom -v
 
-      - name: Run linter on itself (self-test)
+      - name: Run linter
         run: |
           ./bin/loglint run -v ./
 
