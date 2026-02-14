@@ -32,7 +32,7 @@ You add keywords with sensitive data by editing `.golangci.yml`
 
 ## 4. **CI/CD**: 
 Look at the `.github/` directory
-
+___
 # Building
 ## Versions:
 - go: `go1.26.0`
