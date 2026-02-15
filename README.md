@@ -89,6 +89,9 @@ ___
 После `./bin/loglint run --fix`
 ![](docs/loglint_after_fixes.jpg)
 ___
+![](docs/project.jpg)
+___
+checking on kubernetes repository
 ![Kubernetes project with disabled specialsymbols rule](docs/kubernetes_with_disabled_specialsymbols.png)
 # Functions that are checked by the linter
 ## Packages:
